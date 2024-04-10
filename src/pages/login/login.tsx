@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { Alert, Button, Card, Checkbox, Flex, Form, Input, Layout, Space } from "antd"
 import { login, self } from "../../http/api"
 import { Credentials } from "../../types"
-import { useEffect } from "react"
+import { useAuthStore } from "../../store"
 
 const loginUser = async (credentials: Credentials) => {
     const { data } = await login(credentials)
@@ -15,8 +15,9 @@ const getSelf = async () => {
 }
 
 const Login = () => {
+    const { setUser } = useAuthStore()
 
-    const { data: selfData, refetch } = useQuery({
+    const { refetch } = useQuery({
         queryKey: ['self'],
         queryFn: getSelf,
         enabled: false
@@ -26,14 +27,11 @@ const Login = () => {
         mutationKey: ['login'],
         mutationFn: loginUser,
         onSuccess: async () => {
-            refetch()
+            const selfPromise = await refetch()
+            setUser(selfPromise.data)
             console.log('login successfully...')
         }
     })
-
-    useEffect(() => {
-        console.log(selfData)
-    }, [selfData])
 
     return (
         <>
