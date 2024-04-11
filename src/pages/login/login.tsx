@@ -25,18 +25,25 @@ const Login = () => {
         enabled: false
     })
 
-    const { mutate, isPending, isError, error } = useMutation({
+    const { mutate: logoutMutate, isPending: isLogoutPending } = useMutation({
+        mutationKey: ['logout'],
+        mutationFn: logout,
+        onSuccess: async () => {
+            logoutUser()
+            return
+        }
+    })
+
+    const { mutate: loginMutate, isPending, isError, error } = useMutation({
         mutationKey: ['login'],
         mutationFn: loginUser,
         onSuccess: async () => {
             const selfPromise = await refetch()
             if (!isAllowed(selfPromise.data)) {
-                await logout()
-                logoutUser()
+                logoutMutate()
                 return
             }
             setUser(selfPromise.data)
-
         }
     })
 
@@ -50,7 +57,7 @@ const Login = () => {
                         Sign in
                     </Space>}>
 
-                        <Form initialValues={{ remember: true }} onFinish={(values) => mutate(values)} >
+                        <Form initialValues={{ remember: true }} onFinish={(values) => loginMutate(values)} >
                             {isError && <Alert type="error" message={error.message} style={{ marginBottom: '24px' }} />}
                             <Form.Item name={'email'} rules={[
                                 {
@@ -80,7 +87,7 @@ const Login = () => {
                                 </div>
                             </Flex>
                             <Form.Item>
-                                <Button loading={isPending} type="primary" htmlType="submit" style={{ width: '100%' }} >Log in</Button>
+                                <Button loading={isPending || isLogoutPending} type="primary" htmlType="submit" style={{ width: '100%' }} >Log in</Button>
                             </Form.Item>
                         </Form>
 
