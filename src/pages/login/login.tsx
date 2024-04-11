@@ -1,9 +1,10 @@
 import { LockFilled, LockOutlined, UserOutlined } from "@ant-design/icons"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Alert, Button, Card, Checkbox, Flex, Form, Input, Layout, Space } from "antd"
-import { login, self } from "../../http/api"
+import { login, logout, self } from "../../http/api"
 import { Credentials } from "../../types"
 import { useAuthStore } from "../../store"
+import { usePermission } from "../../hooks/usePermission"
 
 const loginUser = async (credentials: Credentials) => {
     const { data } = await login(credentials)
@@ -15,7 +16,8 @@ const getSelf = async () => {
 }
 
 const Login = () => {
-    const { setUser } = useAuthStore()
+    const { setUser, logoutUser } = useAuthStore()
+    const { isAllowed } = usePermission()
 
     const { refetch } = useQuery({
         queryKey: ['self'],
@@ -28,8 +30,13 @@ const Login = () => {
         mutationFn: loginUser,
         onSuccess: async () => {
             const selfPromise = await refetch()
+            if (!isAllowed(selfPromise.data)) {
+                await logout()
+                logoutUser()
+                return
+            }
             setUser(selfPromise.data)
-            console.log('login successfully...')
+
         }
     })
 
@@ -37,7 +44,7 @@ const Login = () => {
         <>
             <Layout style={{ height: '100vh', display: 'grid', placeItems: 'center' }}>
                 <Space direction="vertical" align="center">
-                    <h1>PIZZA</h1>
+                    {/* <h1>PIZZA</h1> */}
                     <Card bordered={false} style={{ width: '300px' }} title={<Space style={{ width: '100%', fontSize: 16, justifyContent: 'center' }}>
                         <LockFilled />
                         Sign in
