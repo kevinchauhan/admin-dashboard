@@ -51,7 +51,7 @@ const Login = () => {
         <>
             <Layout style={{ height: '100vh', display: 'grid', placeItems: 'center' }}>
                 <Space direction="vertical" align="center">
-                    {/* <h1>PIZZA</h1> */}
+                    <h1>BayRoute</h1>
                     <Card bordered={false} style={{ width: '300px' }} title={<Space style={{ width: '100%', fontSize: 16, justifyContent: 'center' }}>
                         <LockFilled />
                         Sign in

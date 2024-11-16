@@ -1,0 +1,8 @@
+.text-primary {
+    color: #064f48;
+}
+
+.ant-menu-item-selected {
+    background-color: #064f48 !important;
+    color: #fff !important;
+}
