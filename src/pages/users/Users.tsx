@@ -1,6 +1,19 @@
+import { RightOutlined } from "@ant-design/icons"
+import { Breadcrumb } from "antd"
+import { NavLink } from "react-router-dom"
+
 const Users = () => {
     return (
-        <div>Users</div>
+        <div>
+            <Breadcrumb separator={<RightOutlined />} items={[
+                {
+                    title: <NavLink to='/'>Dashboard</NavLink>,
+                },
+                {
+                    title: 'User',
+                },
+            ]} />
+        </div>
     )
 }
 
