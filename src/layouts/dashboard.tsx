@@ -13,10 +13,9 @@ const Dashboard = () => {
     const [isUserLoaded, setIsUserLoaded] = useState(false); // Track user loading state
     const [collapsed, setCollapsed] = useState(false);
     const {
-        token: { colorBgContainer, borderRadiusLG },
+        token: { colorBgContainer, },
     } = theme.useToken();
     const location = useLocation();
-
 
     useEffect(() => {
         // Check if user is already available, otherwise set isUserLoaded to true after a brief delay
@@ -82,7 +81,7 @@ const Dashboard = () => {
                 <Layout>
                     <Header style={{ padding: '0 16px 0', background: colorBgContainer }} >
                         <Flex gap='middle' align="start" justify="space-between">
-                            <Badge text='Global' status="success" />
+                            <Badge text={user.role === 'admin' ? 'Global' : user.tenant?.name} status="success" />
                             <Space size={16}>
                                 <Badge dot={true} >
                                     <BellFilled />
@@ -94,16 +93,7 @@ const Dashboard = () => {
                         </Flex>
                     </Header>
                     <Content style={{ margin: '16px' }}>
-                        <div
-                            style={{
-                                padding: 24,
-                                minHeight: '100%',
-                                background: colorBgContainer,
-                                borderRadius: borderRadiusLG,
-                            }}
-                        >
-                            <Outlet />
-                        </div>
+                        <Outlet />
                     </Content>
                 </Layout>
             </Layout >
