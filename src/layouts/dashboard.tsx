@@ -7,7 +7,46 @@ import { Restaurant } from "../components/icons/Restaurant";
 import { UserIcon } from "../components/icons/User";
 import { useMutation } from "@tanstack/react-query";
 import { logout } from "../http/api";
+import { BagIcon } from "../components/icons/BagIcon";
+
 const { Header, Sider, Content } = Layout
+
+const getMenuItems = (role: string) => {
+    const baseItems = [
+        {
+            key: '/',
+            icon: <HomeOutlined />,
+            label: <NavLink to='/'>Home</NavLink>,
+        },
+        {
+            key: '/restaurants',
+            icon: <Icon component={Restaurant} />,
+            label: <NavLink to='/restaurants'>Restaurants</NavLink>,
+        },
+        {
+            key: '/products',
+            icon: <Icon component={BagIcon} />,
+            label: <NavLink to='/products'>Products</NavLink>,
+        }
+    ]
+
+    if (role === 'admin') {
+        const menus = [...baseItems]
+        menus.splice(1, 0, {
+            key: '/users',
+            icon: <Icon component={UserIcon} />,
+            label: <NavLink to='/users'>Users</NavLink>,
+        })
+        return menus
+        return [...baseItems, {
+            key: '/users',
+            icon: <Icon component={UserIcon} />,
+            label: <NavLink to='/users'>Users</NavLink>,
+        },]
+    }
+    return baseItems;
+}
+
 const Dashboard = () => {
     const { user, logoutUser } = useAuthStore();
     const [isUserLoaded, setIsUserLoaded] = useState(false); // Track user loading state
@@ -43,31 +82,7 @@ const Dashboard = () => {
         return <Navigate to={'/auth/login'} replace={true} />
     }
 
-
-
-
-    const items: MenuProps['items'] = [
-        {
-            key: '/',
-            icon: <HomeOutlined />,
-            label: <NavLink to='/'>Home</NavLink>,
-        },
-        {
-            key: '/users',
-            icon: <Icon component={UserIcon} />,
-            label: <NavLink to='/users'>Users</NavLink>,
-        },
-        {
-            key: '/restaurants',
-            icon: <Icon component={Restaurant} />,
-            label: <NavLink to='/restaurants'>Restaurants</NavLink>,
-        },
-        {
-            key: '/products',
-            icon: <Icon component={Restaurant} />,
-            label: <NavLink to='/products'>Products</NavLink>,
-        }
-    ]
+    const items: MenuProps['items'] = getMenuItems(user?.role as string);
 
     return (
         <>
