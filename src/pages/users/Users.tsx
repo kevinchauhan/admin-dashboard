@@ -1,10 +1,12 @@
-import { RightOutlined } from "@ant-design/icons"
+import { PlusOutlined, RightOutlined } from "@ant-design/icons"
 import { useQuery } from "@tanstack/react-query"
-import { Breadcrumb, Table } from "antd"
+import { Breadcrumb, Button, Drawer, Space, Table } from "antd"
 import { Navigate, NavLink } from "react-router-dom"
 import { getUsers } from "../../http/api"
 import { User } from "../../types"
 import { useAuthStore } from "../../store"
+import UserFilter from "./UserFilter"
+import { useState } from "react"
 
 const columns = [
     {
@@ -29,6 +31,7 @@ const columns = [
 
 const Users = () => {
     const { user } = useAuthStore()
+    const [drawerOpen, setDrawerOpen] = useState(false)
 
     const { data: users, isLoading, isError, error } = useQuery({
         queryKey: ['users'],
@@ -42,7 +45,7 @@ const Users = () => {
 
     return (
         <>
-            <Breadcrumb separator={<RightOutlined />} items={[
+            <Breadcrumb style={{ marginBottom: '15px' }} separator={<RightOutlined />} items={[
                 {
                     title: <NavLink to='/'>Dashboard</NavLink>,
                 },
@@ -52,7 +55,23 @@ const Users = () => {
             ]} />
             {isLoading && <div>Loading...</div>}
             {isError && <div>{error.message}</div >}
-            <Table style={{ marginTop: '15px' }} columns={columns} dataSource={users} />
+            <UserFilter onFilerChange={(filterName, filterValue) => { console.log(filterName, filterValue) }} >
+                <Button onClick={() => setDrawerOpen(true)} type="primary" icon={<PlusOutlined />} >
+                    Add User
+                </Button>
+                <Drawer open={drawerOpen} title='Create user' width={720} destroyOnClose={true} onClose={() => setDrawerOpen(false)}
+                    extra={
+                        <Space>
+                            <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+                            <Button type="primary">Submit</Button>
+                        </Space>
+                    }
+                >
+                    <p>Some content...</p>
+                </Drawer>
+            </UserFilter>
+            <Table pagination={false} style={{ marginTop: '15px' }} columns={columns} dataSource={users} rowKey={'id'} />
+
         </>
     )
 }
