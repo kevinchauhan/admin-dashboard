@@ -1,12 +1,13 @@
 import { PlusOutlined, RightOutlined } from "@ant-design/icons"
 import { useQuery } from "@tanstack/react-query"
-import { Breadcrumb, Button, Drawer, Space, Table } from "antd"
+import { Breadcrumb, Button, Drawer, Form, Space, Table, theme } from "antd"
 import { Navigate, NavLink } from "react-router-dom"
 import { getUsers } from "../../http/api"
 import { User } from "../../types"
 import { useAuthStore } from "../../store"
 import UserFilter from "./UserFilter"
 import { useState } from "react"
+import UserForm from "./forms/UserForm"
 
 const columns = [
     {
@@ -31,7 +32,10 @@ const columns = [
 
 const Users = () => {
     const { user } = useAuthStore()
-    const [drawerOpen, setDrawerOpen] = useState(false)
+    const [drawerOpen, setDrawerOpen] = useState(true)
+    const {
+        token: { colorBgLayout, },
+    } = theme.useToken();
 
     const { data: users, isLoading, isError, error } = useQuery({
         queryKey: ['users'],
@@ -59,7 +63,7 @@ const Users = () => {
                 <Button onClick={() => setDrawerOpen(true)} type="primary" icon={<PlusOutlined />} >
                     Add User
                 </Button>
-                <Drawer open={drawerOpen} title='Create user' width={720} destroyOnClose={true} onClose={() => setDrawerOpen(false)}
+                <Drawer styles={{ body: { background: colorBgLayout } }} open={drawerOpen} title='Create user' width={720} destroyOnClose={true} onClose={() => setDrawerOpen(false)}
                     extra={
                         <Space>
                             <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
@@ -67,7 +71,9 @@ const Users = () => {
                         </Space>
                     }
                 >
-                    <p>Some content...</p>
+                    <Form layout="vertical">
+                        <UserForm />
+                    </Form>
                 </Drawer>
             </UserFilter>
             <Table pagination={false} style={{ marginTop: '15px' }} columns={columns} dataSource={users} rowKey={'id'} />

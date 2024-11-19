@@ -12,3 +12,11 @@ export type User = {
     createdAt: string
     updatedAt: string
 }
+
+export type Tenant = {
+    id: number
+    name: string
+    address: string
+    createdAt: string
+    updatedAt: string
+}
