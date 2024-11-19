@@ -13,6 +13,15 @@ export type User = {
     updatedAt: string
 }
 
+export type CreateUserData = {
+    firstName: string
+    lastName: string
+    password: string
+    email: string
+    role: string
+    tenantId: number
+}
+
 export type Tenant = {
     id: number
     name: string

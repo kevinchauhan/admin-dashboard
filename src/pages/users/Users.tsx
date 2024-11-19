@@ -1,9 +1,9 @@
 import { PlusOutlined, RightOutlined } from "@ant-design/icons"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Breadcrumb, Button, Drawer, Form, Space, Table, theme } from "antd"
 import { Navigate, NavLink } from "react-router-dom"
-import { getUsers } from "../../http/api"
-import { User } from "../../types"
+import { createUser, getUsers } from "../../http/api"
+import { CreateUserData, User } from "../../types"
 import { useAuthStore } from "../../store"
 import UserFilter from "./UserFilter"
 import { useState } from "react"
@@ -31,20 +31,36 @@ const columns = [
 ]
 
 const Users = () => {
+    const [form] = Form.useForm()
     const { user } = useAuthStore()
-    const [drawerOpen, setDrawerOpen] = useState(true)
+    const [drawerOpen, setDrawerOpen] = useState(false)
     const {
         token: { colorBgLayout, },
     } = theme.useToken();
 
-    const { data: users, isLoading, isError, error } = useQuery({
+    const { data: users, isLoading, isError, error, refetch } = useQuery({
         queryKey: ['users'],
         queryFn: () => getUsers().then(res => res.data.data),
         retry: 1
     })
 
+    const { mutate: userMutate, } = useMutation({
+        mutationKey: ['createuser'],
+        mutationFn: async (data: CreateUserData) => createUser(data).then(res => res.data),
+        onSuccess: async () => {
+            refetch()
+            form.resetFields()
+            setDrawerOpen(false)
+        }
+    })
+
     if (user?.role !== 'admin') {
         return <Navigate to={'/'} replace={true} />
+    }
+
+    const onHandleSubmit = async () => {
+        await form.validateFields()
+        userMutate(form.getFieldsValue())
     }
 
     return (
@@ -63,15 +79,21 @@ const Users = () => {
                 <Button onClick={() => setDrawerOpen(true)} type="primary" icon={<PlusOutlined />} >
                     Add User
                 </Button>
-                <Drawer styles={{ body: { background: colorBgLayout } }} open={drawerOpen} title='Create user' width={720} destroyOnClose={true} onClose={() => setDrawerOpen(false)}
+                <Drawer styles={{ body: { background: colorBgLayout } }} open={drawerOpen} title='Create user' width={720} destroyOnClose={true} onClose={() => {
+                    setDrawerOpen(false)
+                    form.resetFields()
+                }}
                     extra={
                         <Space>
-                            <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
-                            <Button type="primary">Submit</Button>
+                            <Button onClick={() => {
+                                setDrawerOpen(false)
+                                form.resetFields()
+                            }}>Cancel</Button>
+                            <Button type="primary" onClick={onHandleSubmit}>Submit</Button>
                         </Space>
                     }
                 >
-                    <Form layout="vertical">
+                    <Form layout="vertical" form={form}>
                         <UserForm />
                     </Form>
                 </Drawer>
